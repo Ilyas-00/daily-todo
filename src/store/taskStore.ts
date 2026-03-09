@@ -15,6 +15,8 @@ interface TaskStore {
   history: DayHistory[];
   loading: boolean;
   userId: string | null;
+  theme: "dark" | "light";
+
 
   // ─── Actions ─────────────────────────────
   setUserId: (id: string) => void;
@@ -24,6 +26,7 @@ interface TaskStore {
   toggleTask: (taskId: string) => Promise<void>;
   loadHistory: (startDate: string, endDate: string) => Promise<void>;
   resetIfNewDay: () => Promise<void>;
+  toggleTheme: () => void;
 }
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
@@ -35,6 +38,12 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
 
   setUserId: (id) => set({ userId: id }),
 
+  theme: "dark",
+    toggleTheme: () => {
+    const newTheme = get().theme === "dark" ? "light" : "dark";
+    set({ theme: newTheme });
+    localStorage.setItem("theme", newTheme);
+    },
   // Charger les tasks depuis Firestore
   loadTasks: async () => {
     const { userId } = get();
@@ -93,6 +102,8 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   resetIfNewDay: async () => {
     const lastReset = localStorage.getItem("lastReset");
     const today = new Date().toISOString().split("T")[0];
+    const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
+    if (savedTheme) set({ theme: savedTheme });
 
     if (lastReset !== today) {
       // Nouveau jour → on décoche tout

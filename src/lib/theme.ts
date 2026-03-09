@@ -1,0 +1,38 @@
+export const themes = {
+  dark: {
+    bg: "#0a0a0f",
+    bgCard: "#111118",
+    bgInput: "#0a0a0f",
+    bgItem: "#0f0f1a",
+    bgItemChecked: "#111118",
+    border: "#1f1f30",
+    borderChecked: "#7c3aed40",
+    borderInput: "#2d2d45",
+    text: "#e2e8f0",
+    textMuted: "#6b7280",
+    textChecked: "#4b5563",
+    accent: "#7c3aed",
+    accentLight: "#a855f7",
+    glow: "rgba(124,58,237,0.15)",
+    progressBg: "#1a1a2e",
+  },
+  light: {
+    bg: "#f8f7ff",
+    bgCard: "#ffffff",
+    bgInput: "#f1f0f9",
+    bgItem: "#ffffff",
+    bgItemChecked: "#f8f7ff",
+    border: "#e5e3f5",
+    borderChecked: "#7c3aed40",
+    borderInput: "#d4d0f0",
+    text: "#1a1a2e",
+    textMuted: "#6b7280",
+    textChecked: "#9ca3af",
+    accent: "#7c3aed",
+    accentLight: "#a855f7",
+    glow: "rgba(124,58,237,0.08)",
+    progressBg: "#e5e3f5",
+  },
+};
+
+export type Theme = typeof themes.dark;

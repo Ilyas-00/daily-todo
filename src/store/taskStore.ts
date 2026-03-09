@@ -45,13 +45,27 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     localStorage.setItem("theme", newTheme);
     },
   // Charger les tasks depuis Firestore
-  loadTasks: async () => {
-    const { userId } = get();
-    if (!userId) return;
-    set({ loading: true });
-    const tasks = await getTasks(userId);
-    set({ tasks, loading: false });
-  },
+loadTasks: async () => {
+  const { userId } = get();
+  if (!userId) return;
+  set({ loading: true });
+
+  const today = new Date().toISOString().split("T")[0];
+
+  // Charge les tasks ET l'historique du jour en parallèle
+  const [tasks, todayHistory] = await Promise.all([
+    getTasks(userId),
+    getHistory(userId, today, today),
+  ]);
+
+  // Reconstruit le state checked depuis l'historique du jour
+  const checked: Record<string, boolean> = {};
+  todayHistory.forEach((entry) => {
+    checked[entry.taskId] = entry.done;
+  });
+
+  set({ tasks, checked, loading: false });
+},
 
   // Ajouter une task
   addTask: async (task) => {

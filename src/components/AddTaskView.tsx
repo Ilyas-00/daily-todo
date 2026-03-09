@@ -11,7 +11,7 @@ const DAYS = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
 interface Props { theme: Theme; onDone: () => void; }
 
 export default function AddTaskView({ theme: t, onDone }: Props) {
-  const { addTask } = useTaskStore();
+  const { addTask, tasks, deleteTask } = useTaskStore();
   const [label, setLabel] = useState("");
   const [days, setDays] = useState<number[]>([1, 2, 3, 4, 5]);
   const [loading, setLoading] = useState(false);
@@ -38,19 +38,31 @@ export default function AddTaskView({ theme: t, onDone }: Props) {
     if (!userId) return;
     await addTask({ label: label.trim(), days, createdAt: new Date(), userId });
     setLoading(false);
-    onDone();
+    setLabel("");
+    setDays([1, 2, 3, 4, 5]);
   };
 
   return (
     <div style={{ padding: "0 24px 100px" }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 13, color: t.textMuted, letterSpacing: 2, textTransform: "uppercase" }}>Nouvelle task</div>
-        <div style={{ fontSize: 28, fontWeight: 700, marginTop: 4, color: t.text }}>Ajouter</div>
+        <div style={{ fontSize: 13, color: t.textMuted, letterSpacing: 2, textTransform: "uppercase" }}>Gérer</div>
+        <div style={{ fontSize: 28, fontWeight: 700, marginTop: 4, color: t.text }}>Mes Tasks</div>
+      </div>
+
+  
+
+      {/* Formulaire ajout */}
+      <div style={{ fontSize: 12, color: t.textMuted, fontWeight: 600, marginBottom: 12, letterSpacing: 2 }}>
+        NOUVELLE TASK
       </div>
 
       {/* Nom */}
-      <div style={{ background: t.bgCard, borderRadius: 20, padding: 20, border: `1px solid ${t.border}`, marginBottom: 16, transition: "background 0.3s ease" }}>
-        <div style={{ fontSize: 12, color: t.textMuted, fontWeight: 600, marginBottom: 8 }}>NOM DE LA TASK</div>
+      <div style={{
+        background: t.bgCard, borderRadius: 20,
+        padding: 20, border: `1px solid ${t.border}`,
+        marginBottom: 16, transition: "background 0.3s ease",
+      }}>
+        <div style={{ fontSize: 12, color: t.textMuted, fontWeight: 600, marginBottom: 8 }}>NOM</div>
         <input
           value={label}
           onChange={(e) => setLabel(e.target.value)}
@@ -60,13 +72,16 @@ export default function AddTaskView({ theme: t, onDone }: Props) {
             border: `1px solid ${t.borderInput}`, borderRadius: 12,
             padding: "12px 14px", color: t.text,
             fontSize: 15, outline: "none", boxSizing: "border-box",
-            transition: "background 0.3s ease",
           }}
         />
       </div>
 
       {/* Jours */}
-      <div style={{ background: t.bgCard, borderRadius: 20, padding: 20, border: `1px solid ${t.border}`, marginBottom: 16, transition: "background 0.3s ease" }}>
+      <div style={{
+        background: t.bgCard, borderRadius: 20,
+        padding: 20, border: `1px solid ${t.border}`,
+        marginBottom: 16, transition: "background 0.3s ease",
+      }}>
         <div style={{ fontSize: 12, color: t.textMuted, fontWeight: 600, marginBottom: 12 }}>JOURS</div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
           {Object.entries(presets).map(([name, presetDays]) => {
@@ -96,9 +111,11 @@ export default function AddTaskView({ theme: t, onDone }: Props) {
       </div>
 
       {error && (
-        <div style={{ padding: "12px 16px", borderRadius: 12, background: "#2d1b1b", border: "1px solid #7c3a3a", color: "#f87171", fontSize: 14, marginBottom: 16 }}>
-          {error}
-        </div>
+        <div style={{
+          padding: "12px 16px", borderRadius: 12,
+          background: "#2d1b1b", border: "1px solid #7c3a3a",
+          color: "#f87171", fontSize: 14, marginBottom: 16,
+        }}>{error}</div>
       )}
 
       <button onClick={handleSubmit} disabled={loading} style={{
@@ -111,6 +128,43 @@ export default function AddTaskView({ theme: t, onDone }: Props) {
       }}>
         {loading ? "Ajout en cours..." : "Ajouter la task ✦"}
       </button>
+      <div style={{
+        marginBottom: 24, marginTop: 24, transition: "background 0.3s ease",
+      }}></div>
+
+          {/* Liste des tasks existantes */}
+      <div style={{
+        background: t.bgCard, borderRadius: 20,
+        padding: 20, border: `1px solid ${t.border}`,
+        marginBottom: 24, transition: "background 0.3s ease",
+      }}>
+        <div style={{ fontSize: 12, color: t.textMuted, fontWeight: 600, marginBottom: 12 }}>
+          TASKS EXISTANTES ({tasks.length})
+        </div>
+        {tasks.length === 0 && (
+          <div style={{ color: t.textMuted, fontSize: 14 }}>Aucune task pour l'instant</div>
+        )}
+        {tasks.map((task) => (
+          <div key={task.id} style={{
+            display: "flex", alignItems: "center",
+            justifyContent: "space-between",
+            padding: "12px 0",
+            borderBottom: `1px solid ${t.border}`,
+          }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>{task.label}</div>
+              <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
+                {task.days.map(d => DAYS[d]).join(", ")}
+              </div>
+            </div>
+            <button onClick={() => deleteTask(task.id)} style={{
+              background: "transparent", border: "none",
+              cursor: "pointer", fontSize: 18, padding: 4,
+              flexShrink: 0,
+            }}>🗑️</button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
